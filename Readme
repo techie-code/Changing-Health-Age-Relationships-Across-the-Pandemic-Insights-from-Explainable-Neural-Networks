@@ -1,0 +1,322 @@
+# Changing Health-Age Relationships Across the Pandemic
+
+### Insights from Explainable Neural Networks
+
+This repository contains the code, data-processing workflow, modelling experiments, and explainability analysis developed for an MSc Statistical Data Science dissertation investigating whether relationships between health indicators and chronological age changed across the COVID-19 pandemic period.
+
+The study compares traditional statistical modelling with nonlinear and machine-learning approaches using data from the **National Health and Nutrition Examination Survey (NHANES)**.
+
+---
+
+## Project Overview
+
+Ageing is associated with complex changes across cardiovascular, metabolic, liver, kidney, and other physiological systems. These relationships may be nonlinear and may not be fully represented by conventional linear models.
+
+This project investigates whether explainable machine-learning models can identify nonlinear relationships between routinely measured health indicators and **chronological age**, and whether the relative importance of these indicators differs between pre-pandemic and post-pandemic NHANES samples.
+
+The analysis compares three modelling approaches:
+
+* **Linear Regression (LR)** as an interpretable statistical baseline
+* **Generalized Additive Models (GAMs)** for flexible nonlinear relationships
+* **Multilayer Perceptron (MLP)** neural networks for more complex nonlinear patterns and interactions
+
+Explainability methods are then used to investigate how individual health variables contribute to model predictions.
+
+---
+
+## Research Objectives
+
+The main objectives of the project are to:
+
+1. Evaluate how well health indicators predict chronological age.
+2. Compare linear, additive nonlinear, and neural-network modelling approaches.
+3. Investigate nonlinear relationships between individual health indicators and age.
+4. Use explainable AI techniques to interpret neural-network predictions.
+5. Compare health-age relationships between pre-pandemic and post-pandemic NHANES samples.
+
+The analysis is **predictive and associational rather than causal**. Differences identified between periods should therefore not be interpreted as evidence that the COVID-19 pandemic directly caused changes in particular health indicators.
+
+---
+
+## Data
+
+The project uses publicly available data from the **National Health and Nutrition Examination Survey (NHANES)**.
+
+The repository contains datasets used for the pre-pandemic and post-pandemic analyses.
+
+### Health Variables
+
+The modelling pipeline uses a common set of demographic and clinical measurements, including:
+
+| Category       | Variables                                         |
+| -------------- | ------------------------------------------------- |
+| Demographic    | Sex                                               |
+| Anthropometric | BMI                                               |
+| Cardiovascular | Systolic blood pressure, Diastolic blood pressure |
+| Glycaemic      | Glucose, HbA1c                                    |
+| Lipid          | Total cholesterol, HDL cholesterol                |
+| Liver-related  | Albumin, ALT, AST, GGT                            |
+| Kidney-related | BUN, Creatinine                                   |
+
+**Target variable:** Chronological age in years.
+
+---
+
+## Repository Structure
+
+```text
+Changing-Health-Age-Relationships-Across-the-Pandemic-Insights-from-Explainable-Neural-Networks/
+│
+├── 2017-2018data/
+│   └── Pre-pandemic NHANES data
+│
+├── datafiles/
+│   └── Supporting/raw data files
+│
+├── postpandemic/
+│   └── Post-pandemic NHANES data
+│
+├── Dissertation_Pre_Post_Comparison.ipynb
+│   └── Main pre-vs-post modelling and explainability analysis
+│
+├── linear regression 2017-2018.ipynb
+│   └── Pre-pandemic linear regression analysis
+│
+├── linear regression post pandemic.ipynb
+│   └── Post-pandemic linear regression analysis
+│
+└── LICENSE
+```
+
+---
+
+## Methodology
+
+### 1. Data Preparation
+
+NHANES datasets are combined using the participant identifier (`SEQN`). Relevant demographic, examination, and laboratory variables are selected and transformed into a consistent modelling dataset.
+
+The preprocessing workflow includes:
+
+* Variable selection
+* Dataset merging
+* Missing-value handling
+* Feature preparation
+* Categorical-variable encoding
+* Train/test splitting
+* Feature scaling where required
+
+---
+
+### 2. Linear Regression
+
+Linear regression provides the statistical baseline.
+
+It assumes that chronological age can be represented approximately as a linear combination of the selected health indicators.
+
+The model provides a useful benchmark against which the benefits of nonlinear modelling can be evaluated.
+
+---
+
+### 3. Generalized Additive Model
+
+A Generalized Additive Model extends linear regression by allowing predictors to have smooth nonlinear relationships with age.
+
+Conceptually,
+
+```text
+Age = β₀ + f₁(X₁) + f₂(X₂) + ... + fₚ(Xₚ) + ε
+```
+
+where each `f(X)` represents a smooth function learned from the data.
+
+GAMs therefore provide a useful middle ground between conventional regression and more flexible neural networks.
+
+---
+
+### 4. Multilayer Perceptron
+
+A feed-forward Multilayer Perceptron is used to capture more complex nonlinear relationships between the health indicators and chronological age.
+
+The MLP is evaluated using held-out observations and cross-validation rather than relying only on training performance.
+
+---
+
+## Model Evaluation
+
+Predictive performance is evaluated using:
+
+* **Mean Absolute Error (MAE)**
+* **Root Mean Squared Error (RMSE)**
+* **R²**
+* **Cross-validation**
+
+Using several metrics provides a more complete assessment of model performance and helps determine whether additional nonlinear modelling complexity produces meaningful predictive improvements.
+
+---
+
+## Explainable AI
+
+Prediction accuracy alone does not explain what a neural network has learned.
+
+The project therefore combines predictive modelling with model interpretation.
+
+### SHAP
+
+**SHAP (SHapley Additive exPlanations)** is used to interpret the MLP and estimate the contribution of individual health indicators to model predictions.
+
+Mean absolute SHAP values are used to examine global feature importance.
+
+This makes it possible to investigate questions such as:
+
+* Which health indicators contribute most strongly to age prediction?
+* Are the important predictors consistent across periods?
+* Do particular variables increase or decrease in relative importance after the pandemic?
+* Are the neural network's predictions driven by clinically plausible patterns?
+
+---
+
+## Pre-Pandemic Results
+
+For the 2017-2018 sample, the held-out test results were:
+
+| Model             |       MAE |       RMSE |        R² |
+| ----------------- | --------: | ---------: | --------: |
+| Linear Regression |    10.792 |     13.295 |     0.431 |
+| GAM               |     9.273 |     11.422 |     0.580 |
+| MLP               | **8.347** | **10.608** | **0.638** |
+
+The progression from Linear Regression to GAM and then MLP demonstrates that nonlinear modelling captured additional predictive structure in the selected health indicators.
+
+Cross-validation was also performed to examine whether these results were stable across different data partitions.
+
+---
+
+## Explainability Findings
+
+In the pre-pandemic MLP analysis, systolic blood pressure had the largest mean absolute SHAP value among the included predictors.
+
+Other influential variables included:
+
+* ALT
+* BUN
+* HbA1c
+* AST
+* Diastolic blood pressure
+* Glucose
+* BMI
+* Albumin
+* HDL cholesterol
+
+The pre/post comparison also indicated changes in the relative importance of some predictors. For example, systolic blood pressure remained highly influential across periods, while the relative positions of variables such as diastolic blood pressure, ALT, and AST changed.
+
+These results should be interpreted as **changes in model-derived predictive associations**, rather than evidence of causal effects of the pandemic.
+
+---
+
+## Key Contribution
+
+Rather than using a neural network only as a predictive black box, this project combines:
+
+```text
+Linear Regression
+        ↓
+Generalized Additive Model
+        ↓
+Neural Network
+        ↓
+Explainable AI
+        ↓
+Pre-Pandemic vs Post-Pandemic Comparison
+```
+
+This framework makes it possible to examine both **predictive performance** and **how the learned health-age relationships differ across modelling approaches and time periods**.
+
+---
+
+## Running the Project
+
+Clone the repository:
+
+```bash
+git clone https://github.com/techie-code/Changing-Health-Age-Relationships-Across-the-Pandemic-Insights-from-Explainable-Neural-Networks.git
+```
+
+Move into the project directory:
+
+```bash
+cd Changing-Health-Age-Relationships-Across-the-Pandemic-Insights-from-Explainable-Neural-Networks
+```
+
+Launch Jupyter Notebook or JupyterLab:
+
+```bash
+jupyter notebook
+```
+
+The main analysis is contained in:
+
+```text
+Dissertation_Pre_Post_Comparison.ipynb
+```
+
+---
+
+## Main Python Libraries
+
+The notebooks use standard Python statistical and machine-learning libraries, including tools for:
+
+* Data manipulation and numerical computation
+* Statistical modelling
+* Machine learning
+* Neural networks
+* Explainable AI
+* Data visualization
+
+The exact environment may depend on the notebook version and installed package versions.
+
+---
+
+## Interpretation and Limitations
+
+Several limitations should be considered when interpreting the analysis.
+
+NHANES is observational and cross-sectional, so the results identify statistical and predictive associations rather than causal relationships.
+
+Differences between pre-pandemic and post-pandemic models may reflect several factors, including:
+
+* Changes in the sampled population
+* Measurement differences
+* Sampling variability
+* Changes in health patterns
+* Model uncertainty
+* Broader temporal changes unrelated to the pandemic itself
+
+Consequently, changes between periods should not automatically be attributed directly to COVID-19 or pandemic-related effects.
+
+---
+
+## Author
+
+**Aishwarya Lakshmi Sridharan**
+
+MSc Statistical Data Science
+School of Mathematics
+
+This repository was developed as part of an MSc dissertation project.
+
+---
+
+## License
+
+This project is distributed under the **Apache License 2.0**.
+
+See the `LICENSE` file for full licensing terms.
+
+---
+
+## Acknowledgements
+
+This project uses publicly available data from the **National Health and Nutrition Examination Survey (NHANES)** conducted by the U.S. National Center for Health Statistics.
+
+The project was completed as part of postgraduate study in Statistical Data Science.
